@@ -1,10 +1,181 @@
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Connection conexion = Conexion.conectar();
+        Scanner sc = new Scanner(System.in);
 
+        try (Connection conexion = Conexion.conectar()) {
+
+            if (conexion == null) {
+                System.out.println("No se puede continuar sin conexión a la base de datos.");
+                return;
+            }   
+
+            int opcion;
+
+            do {
+                System.out.println("\n====================================");
+                System.out.println("       SISTEMA DE BIBLIOTECA");
+                System.out.println("====================================\n");
+                System.out.println("1. Gestionar libros");
+                System.out.println("2. Gestionar socios");
+                System.out.println("3. Gestionar ejemplares");
+                System.out.println("4. Gestionar préstamos");
+                System.out.println("0. Salir");
+                System.out.print("\nSeleccione una opción: ");
+                opcion = leerOpcion(sc);
+
+                switch (opcion) {
+                    case 1:
+                        menuLibros(sc, conexion);
+                        break;
+                    case 2:
+                        menuSocios(sc, conexion);
+                        break;
+                    case 3:
+                        menuEjemplares(sc, conexion);
+                        break;
+                    case 4:
+                        menuPrestamos(sc, conexion);
+                        break;
+                    case 0:
+                        System.out.println("Saliendo del sistema...");
+                        break;
+                    default:
+                        System.out.println("Opción inválida.");
+                }
+            } while (opcion != 0);
+
+        } catch (SQLException e) {
+            System.out.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
+
+    private static void menuLibros(Scanner sc, Connection conexion) {
+        int opcion;
+
+        do {
+            System.out.println("\n------- GESTIÓN DE LIBROS -------");
+            System.out.println("1. Agregar libro");
+            System.out.println("2. Listar libros");
+            System.out.println("3. Buscar libro");
+            System.out.println("4. Modificar libro");
+            System.out.println("5. Eliminar libro");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione una opción: ");
+            opcion = leerOpcion(sc);
+
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    System.out.println("(pendiente)");
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    private static void menuSocios(Scanner sc, Connection conexion) {
+        int opcion;
+
+        do {
+            System.out.println("\n------- GESTIÓN DE SOCIOS -------");
+            System.out.println("1. Agregar socio");
+            System.out.println("2. Listar socios");
+            System.out.println("3. Buscar socio");
+            System.out.println("4. Modificar socio");
+            System.out.println("5. Eliminar socio");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione una opción: ");
+            opcion = leerOpcion(sc);
+
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    System.out.println("(pendiente)");
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    private static void menuEjemplares(Scanner sc, Connection conexion) {
+        int opcion;
+
+        do {
+            System.out.println("\n------- GESTIÓN DE EJEMPLARES -------");
+            System.out.println("1. Agregar ejemplar");
+            System.out.println("2. Listar ejemplares de un libro");
+            System.out.println("3. Modificar estado");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione una opción: ");
+            opcion = leerOpcion(sc);
+
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                    System.out.println("(pendiente)");
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    private static void menuPrestamos(Scanner sc, Connection conexion) {
+        int opcion;
+
+        do {
+            System.out.println("\n------- GESTIÓN DE PRÉSTAMOS -------");
+            System.out.println("1. Registrar préstamo");
+            System.out.println("2. Registrar devolución");
+            System.out.println("3. Listar préstamos");
+            System.out.println("0. Volver");
+            System.out.print("Seleccione una opción: ");
+            opcion = leerOpcion(sc);
+
+            switch (opcion) {
+                case 1:
+                case 2:
+                case 3:
+                    System.out.println("(pendiente)");
+                    break;
+                case 0:
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        } while (opcion != 0);
+    }
+
+    private static int leerOpcion(Scanner sc) {
+        try {
+            int opcion = sc.nextInt();
+            sc.nextLine();
+            return opcion;
+        } catch (InputMismatchException e) {
+            sc.nextLine();
+            return -1;
+        }
     }
 }
