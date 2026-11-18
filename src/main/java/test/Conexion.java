@@ -19,7 +19,7 @@ public class Conexion {
             conexion = DriverManager.getConnection(URL_BASEDATOS, USER, PASS);
             System.out.println("Conexión exitosa a la base de datos Biblioteca_DB.");
         } catch (ClassNotFoundException e) {
-            System.out.println("Error: no se encontró el driver JDBC. Revise que el .jar esté agregado como librería.");
+            System.out.println("Error: no se encontró el driver JDBC. Revise la dependencia del driver en el pom.xml.");
         } catch (SQLException e) {
             System.out.println("Error al conectar con la base de datos: " + e.getMessage());
         }
