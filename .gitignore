@@ -1,0 +1,7 @@
+# Archivos personales: no se suben
+apuntes_NOCOMMITEAR/
+
+# Generados por IntelliJ / compilación
+out/
+.idea/
+*.iml
