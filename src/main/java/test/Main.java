@@ -86,7 +86,7 @@ public class Main {
                     Libro.modificar(sc, conexion);
                     break;
                 case 5:
-                    System.out.println("(pendiente)");
+                    Libro.eliminar(sc, conexion);
                     break;
                 case 0:
                     break;

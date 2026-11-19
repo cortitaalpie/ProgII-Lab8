@@ -164,6 +164,63 @@ public class Libro {
         }
     }
 
+    public static void eliminar(Scanner sc, Connection conexion) {
+        String isbn = Main.leerTexto(sc, "Ingrese el ISBN del libro a eliminar: ");
+
+        try {
+            Libro libro = buscarPorIsbn(conexion, isbn);
+
+            if (libro == null) {
+                System.out.println("No se encontró un libro con ese ISBN.");
+                return;
+            }
+
+            if (contar(conexion, "SELECT COUNT(*) FROM PRESTAMO WHERE ISBN = ?", isbn) > 0) {
+                System.out.println("No se puede eliminar \"" + libro.getTitulo() + "\" porque tiene préstamos registrados.");
+                return;
+            }
+
+            int ejemplares = contar(conexion, "SELECT COUNT(*) FROM EJEMPLAR WHERE ISBN = ?", isbn);
+            if (ejemplares > 0) {
+                System.out.println("Atención: también se eliminarán sus " + ejemplares + " ejemplar(es).");
+            }
+
+            String respuesta = Main.leerTexto(sc, "¿Está seguro de eliminar el libro \"" + libro.getTitulo() + "\"? (S/N): ");
+
+            if (!respuesta.equalsIgnoreCase("S")) {
+                System.out.println("Operación cancelada.");
+                return;
+            }
+
+            String sql = "DELETE FROM LIBRO WHERE ISBN = ?";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setString(1, isbn);
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Libro eliminado correctamente.");
+                } else {
+                    System.out.println("No se pudo eliminar el libro.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar el libro: " + e.getMessage());
+        }
+    }
+
+    private static int contar(Connection conexion, String sql, String isbn) throws SQLException {
+        try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+            instruccion.setString(1, isbn);
+
+            try (ResultSet conjuntoResultados = instruccion.executeQuery()) {
+                conjuntoResultados.next();
+                return conjuntoResultados.getInt(1);
+            }
+        }
+    }
+
     public static Libro buscarPorIsbn(Connection conexion, String isbn) throws SQLException {
         String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
 
