@@ -123,6 +123,47 @@ public class Libro {
         }
     }
 
+    public static void modificar(Scanner sc, Connection conexion) {
+        String isbn = Main.leerTexto(sc, "Ingrese el ISBN del libro a modificar: ");
+
+        try {
+            Libro libro = buscarPorIsbn(conexion, isbn);
+
+            if (libro == null) {
+                System.out.println("No se encontró un libro con ese ISBN.");
+                return;
+            }
+
+            System.out.println("\nDatos actuales:\n" + libro);
+            System.out.println("\nIngrese los nuevos datos:");
+
+            String titulo = Main.leerTexto(sc, "Título: ");
+            String autor = Main.leerTexto(sc, "Autor: ");
+            String editorial = Main.leerTexto(sc, "Editorial: ");
+            int anio = Main.leerEntero(sc, "Año de publicación: ");
+
+            String sql = "UPDATE LIBRO SET titulo = ?, autor = ?, editorial = ?, anio_publicacion = ? WHERE ISBN = ?";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setString(1, titulo);
+                instruccion.setString(2, autor);
+                instruccion.setString(3, editorial);
+                instruccion.setInt(4, anio);
+                instruccion.setString(5, isbn);
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Libro modificado correctamente.");
+                } else {
+                    System.out.println("No se pudo modificar el libro.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al modificar el libro: " + e.getMessage());
+        }
+    }
+
     public static Libro buscarPorIsbn(Connection conexion, String isbn) throws SQLException {
         String sql = "SELECT * FROM LIBRO WHERE ISBN = ?";
 

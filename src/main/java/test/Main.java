@@ -83,6 +83,8 @@ public class Main {
                     Libro.buscar(sc, conexion);
                     break;
                 case 4:
+                    Libro.modificar(sc, conexion);
+                    break;
                 case 5:
                     System.out.println("(pendiente)");
                     break;
