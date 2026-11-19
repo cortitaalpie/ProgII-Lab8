@@ -73,9 +73,13 @@ public class Main {
             opcion = leerOpcion(sc);
 
             switch (opcion) {
-                case 1:
                 case 2:
+                    Libro.listar(conexion);
+                    break;
                 case 3:
+                    Libro.buscar(sc, conexion);
+                    break;
+                case 1:
                 case 4:
                 case 5:
                     System.out.println("(pendiente)");
@@ -168,6 +172,20 @@ public class Main {
                     System.out.println("Opción inválida.");
             }
         } while (opcion != 0);
+    }
+
+    static String leerTexto(Scanner sc, String mensaje) {
+        String texto;
+
+        do {
+            System.out.print(mensaje);
+            texto = sc.nextLine().trim();
+            if (texto.isBlank()) {
+                System.out.println("El dato no puede estar vacío.");
+            }
+        } while (texto.isBlank());
+
+        return texto;
     }
 
     private static int leerOpcion(Scanner sc) {
