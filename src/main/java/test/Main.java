@@ -184,6 +184,8 @@ public class Main {
 
             switch (opcion) {
                 case 1:
+                    Prestamo.registrar(sc, conexion);
+                    break;
                 case 2:
                     System.out.println("(pendiente)");
                     break;
