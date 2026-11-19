@@ -112,6 +112,22 @@ public class Socio {
         }
     }
 
+    public static void buscar(Scanner sc, Connection conexion) {
+        String dni = Main.leerTexto(sc, "Ingrese el DNI: ");
+
+        try {
+            Socio socio = buscarPorDni(conexion, dni);
+
+            if (socio == null) {
+                System.out.println("No se encontró un socio con ese DNI.");
+            } else {
+                System.out.println("\n" + socio);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al buscar el socio: " + e.getMessage());
+        }
+    }
+
     public static Socio buscarPorDni(Connection conexion, String dni) throws SQLException {
         String sql = "SELECT * FROM SOCIO WHERE DNI = ?";
 
