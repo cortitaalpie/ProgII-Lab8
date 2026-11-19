@@ -91,6 +91,27 @@ public class Socio {
         }
     }
 
+    public static void listar(Connection conexion) {
+        String sql = "SELECT id_socio, nombre, DNI, telefono FROM SOCIO";
+
+        try (PreparedStatement instruccion = conexion.prepareStatement(sql);
+             ResultSet conjuntoResultados = instruccion.executeQuery()) {
+
+            System.out.printf("%n%-6s%-20s%-11s%s%n", "ID", "NOMBRE", "DNI", "TELÉFONO");
+            System.out.println("---------------------------------------------------------");
+
+            while (conjuntoResultados.next()) {
+                System.out.printf("%-6d%-20s%-11s%s%n",
+                        conjuntoResultados.getInt("id_socio"),
+                        conjuntoResultados.getString("nombre"),
+                        conjuntoResultados.getString("DNI"),
+                        conjuntoResultados.getString("telefono"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al listar los socios: " + e.getMessage());
+        }
+    }
+
     public static Socio buscarPorDni(Connection conexion, String dni) throws SQLException {
         String sql = "SELECT * FROM SOCIO WHERE DNI = ?";
 

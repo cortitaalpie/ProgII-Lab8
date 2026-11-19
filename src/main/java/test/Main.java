@@ -121,6 +121,8 @@ public class Main {
                     Socio.agregar(sc, conexion);
                     break;
                 case 2:
+                    Socio.listar(conexion);
+                    break;
                 case 3:
                 case 4:
                 case 5:
