@@ -2,10 +2,16 @@ package test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
+
+    static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     public static void main(String[] args) {
 
@@ -112,6 +118,8 @@ public class Main {
 
             switch (opcion) {
                 case 1:
+                    Socio.agregar(sc, conexion);
+                    break;
                 case 2:
                 case 3:
                 case 4:
@@ -202,6 +210,17 @@ public class Main {
             } catch (InputMismatchException e) {
                 sc.nextLine();
                 System.out.println("Debe ingresar un número.");
+            }
+        }
+    }
+
+    static LocalDate leerFecha(Scanner sc, String mensaje) {
+        while (true) {
+            String texto = leerTexto(sc, mensaje);
+            try {
+                return LocalDate.parse(texto, FORMATO_FECHA);
+            } catch (DateTimeParseException e) {
+                System.out.println("Fecha inválida. Use el formato dd/mm/aaaa.");
             }
         }
     }
