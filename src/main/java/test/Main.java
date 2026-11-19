@@ -157,6 +157,8 @@ public class Main {
                     Ejemplar.agregar(sc, conexion);
                     break;
                 case 2:
+                    Ejemplar.listarPorLibro(sc, conexion);
+                    break;
                 case 3:
                     System.out.println("(pendiente)");
                     break;
