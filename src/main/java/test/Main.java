@@ -73,13 +73,15 @@ public class Main {
             opcion = leerOpcion(sc);
 
             switch (opcion) {
+                case 1:
+                    Libro.agregar(sc, conexion);
+                    break;
                 case 2:
                     Libro.listar(conexion);
                     break;
                 case 3:
                     Libro.buscar(sc, conexion);
                     break;
-                case 1:
                 case 4:
                 case 5:
                     System.out.println("(pendiente)");
@@ -186,6 +188,20 @@ public class Main {
         } while (texto.isBlank());
 
         return texto;
+    }
+
+    static int leerEntero(Scanner sc, String mensaje) {
+        while (true) {
+            System.out.print(mensaje);
+            try {
+                int numero = sc.nextInt();
+                sc.nextLine();
+                return numero;
+            } catch (InputMismatchException e) {
+                sc.nextLine();
+                System.out.println("Debe ingresar un número.");
+            }
+        }
     }
 
     private static int leerOpcion(Scanner sc) {

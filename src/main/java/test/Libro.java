@@ -51,6 +51,42 @@ public class Libro {
                 "\nAño de publicación: " + anioPublicacion;
     }
 
+    public static void agregar(Scanner sc, Connection conexion) {
+        String isbn = Main.leerTexto(sc, "ISBN: ");
+
+        try {
+            if (buscarPorIsbn(conexion, isbn) != null) {
+                System.out.println("Ya existe un libro con ese ISBN.");
+                return;
+            }
+
+            String titulo = Main.leerTexto(sc, "Título: ");
+            String autor = Main.leerTexto(sc, "Autor: ");
+            String editorial = Main.leerTexto(sc, "Editorial: ");
+            int anio = Main.leerEntero(sc, "Año de publicación: ");
+
+            String sql = "INSERT INTO LIBRO (ISBN, titulo, autor, editorial, anio_publicacion) VALUES (?, ?, ?, ?, ?)";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setString(1, isbn);
+                instruccion.setString(2, titulo);
+                instruccion.setString(3, autor);
+                instruccion.setString(4, editorial);
+                instruccion.setInt(5, anio);
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Libro agregado correctamente.");
+                } else {
+                    System.out.println("No se pudo agregar el libro.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al agregar el libro: " + e.getMessage());
+        }
+    }
+
     public static void listar(Connection conexion) {
         String sql = "SELECT ISBN, titulo, autor FROM LIBRO";
 
