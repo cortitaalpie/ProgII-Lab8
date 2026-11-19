@@ -185,8 +185,10 @@ public class Main {
             switch (opcion) {
                 case 1:
                 case 2:
-                case 3:
                     System.out.println("(pendiente)");
+                    break;
+                case 3:
+                    Prestamo.listar(conexion);
                     break;
                 case 0:
                     break;
