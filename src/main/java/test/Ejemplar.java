@@ -116,6 +116,62 @@ public class Ejemplar {
         }
     }
 
+    public static void modificarEstado(Scanner sc, Connection conexion) {
+        String isbn = Main.leerTexto(sc, "ISBN del libro: ");
+        int nroEjemplar = Main.leerEntero(sc, "Número de ejemplar: ");
+
+        try {
+            Ejemplar ejemplar = buscar(conexion, isbn, nroEjemplar);
+
+            if (ejemplar == null) {
+                System.out.println("No se encontró ese ejemplar.");
+                return;
+            }
+
+            System.out.println("Estado actual: " + ejemplar.getEstado());
+            System.out.println("1. " + DISPONIBLE);
+            System.out.println("2. " + PRESTADO);
+
+            int opcion = Main.leerEntero(sc, "Seleccione el nuevo estado: ");
+            String nuevoEstado;
+
+            switch (opcion) {
+                case 1:
+                    nuevoEstado = DISPONIBLE;
+                    break;
+                case 2:
+                    nuevoEstado = PRESTADO;
+                    break;
+                default:
+                    System.out.println("Opción inválida.");
+                    return;
+            }
+
+            if (nuevoEstado.equals(ejemplar.getEstado())) {
+                System.out.println("El ejemplar ya está en estado " + nuevoEstado + ".");
+                return;
+            }
+
+            String sql = "UPDATE EJEMPLAR SET estado = ? WHERE ISBN = ? AND nro_ejemplar = ?";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setString(1, nuevoEstado);
+                instruccion.setString(2, isbn);
+                instruccion.setInt(3, nroEjemplar);
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Estado modificado correctamente.");
+                } else {
+                    System.out.println("No se pudo modificar el estado.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al modificar el estado: " + e.getMessage());
+        }
+    }
+
     public static Ejemplar buscar(Connection conexion, String isbn, int nroEjemplar) throws SQLException {
         String sql = "SELECT * FROM EJEMPLAR WHERE ISBN = ? AND nro_ejemplar = ?";
 

@@ -160,7 +160,7 @@ public class Main {
                     Ejemplar.listarPorLibro(sc, conexion);
                     break;
                 case 3:
-                    System.out.println("(pendiente)");
+                    Ejemplar.modificarEstado(sc, conexion);
                     break;
                 case 0:
                     break;
