@@ -187,7 +187,7 @@ public class Main {
                     Prestamo.registrar(sc, conexion);
                     break;
                 case 2:
-                    System.out.println("(pendiente)");
+                    Prestamo.registrarDevolucion(sc, conexion);
                     break;
                 case 3:
                     Prestamo.listar(conexion);

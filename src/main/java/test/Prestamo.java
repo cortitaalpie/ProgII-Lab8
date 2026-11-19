@@ -11,6 +11,53 @@ import java.util.Scanner;
 
 public class Prestamo {
 
+    private int idPrestamo;
+    private int idSocio;
+    private String isbn;
+    private int nroEjemplar;
+    private LocalDate fechaPrestamo;
+    private LocalDate fechaDevolucionPrevista;
+    private LocalDate fechaDevolucionReal;
+
+    public Prestamo(int idPrestamo, int idSocio, String isbn, int nroEjemplar, LocalDate fechaPrestamo,
+                    LocalDate fechaDevolucionPrevista, LocalDate fechaDevolucionReal) {
+        this.idPrestamo = idPrestamo;
+        this.idSocio = idSocio;
+        this.isbn = isbn;
+        this.nroEjemplar = nroEjemplar;
+        this.fechaPrestamo = fechaPrestamo;
+        this.fechaDevolucionPrevista = fechaDevolucionPrevista;
+        this.fechaDevolucionReal = fechaDevolucionReal;
+    }
+
+    public int getIdPrestamo() {
+        return idPrestamo;
+    }
+
+    public int getIdSocio() {
+        return idSocio;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public int getNroEjemplar() {
+        return nroEjemplar;
+    }
+
+    public LocalDate getFechaPrestamo() {
+        return fechaPrestamo;
+    }
+
+    public LocalDate getFechaDevolucionPrevista() {
+        return fechaDevolucionPrevista;
+    }
+
+    public LocalDate getFechaDevolucionReal() {
+        return fechaDevolucionReal;
+    }
+
     public static void registrar(Scanner sc, Connection conexion) {
         try {
             int idSocio = Main.leerEntero(sc, "ID del socio: ");
@@ -85,6 +132,88 @@ public class Prestamo {
         } catch (SQLException e) {
             System.out.println("Error al registrar el préstamo: " + e.getMessage());
         }
+    }
+
+    public static void registrarDevolucion(Scanner sc, Connection conexion) {
+        int idPrestamo = Main.leerEntero(sc, "ID del préstamo: ");
+
+        try {
+            Prestamo prestamo = buscarPorId(conexion, idPrestamo);
+
+            if (prestamo == null) {
+                System.out.println("No se encontró un préstamo con ese ID.");
+                return;
+            }
+
+            if (prestamo.getFechaDevolucionReal() != null) {
+                System.out.println("Este préstamo ya fue devuelto el " + prestamo.getFechaDevolucionReal().format(Main.FORMATO_FECHA) + ".");
+                return;
+            }
+
+            LocalDate hoy = LocalDate.now();
+
+            String sqlPrestamo = "UPDATE PRESTAMO SET fecha_devolucion_real = ? WHERE id_prestamo = ?";
+            String sqlEjemplar = "UPDATE EJEMPLAR SET estado = ? WHERE ISBN = ? AND nro_ejemplar = ?";
+
+            // transacción: la fecha de devolución y el cambio de estado se guardan juntos o no se guarda ninguno
+            conexion.setAutoCommit(false);
+
+            try (PreparedStatement actualizarPrestamo = conexion.prepareStatement(sqlPrestamo);
+                 PreparedStatement actualizarEjemplar = conexion.prepareStatement(sqlEjemplar)) {
+
+                actualizarPrestamo.setDate(1, Date.valueOf(hoy));
+                actualizarPrestamo.setInt(2, idPrestamo);
+                int filasPrestamo = actualizarPrestamo.executeUpdate();
+
+                actualizarEjemplar.setString(1, Ejemplar.DISPONIBLE);
+                actualizarEjemplar.setString(2, prestamo.getIsbn());
+                actualizarEjemplar.setInt(3, prestamo.getNroEjemplar());
+                int filasEjemplar = actualizarEjemplar.executeUpdate();
+
+                if (filasPrestamo == 1 && filasEjemplar == 1) {
+                    conexion.commit();
+                    System.out.println("Devolución registrada correctamente el " + hoy.format(Main.FORMATO_FECHA) + ".");
+                } else {
+                    conexion.rollback();
+                    System.out.println("No se pudo registrar la devolución. No se guardó ningún cambio.");
+                }
+            } catch (SQLException e) {
+                conexion.rollback();
+                System.out.println("Error al registrar la devolución. No se guardó ningún cambio: " + e.getMessage());
+            } finally {
+                conexion.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al registrar la devolución: " + e.getMessage());
+        }
+    }
+
+    public static Prestamo buscarPorId(Connection conexion, int idPrestamo) throws SQLException {
+        String sql = "SELECT * FROM PRESTAMO WHERE id_prestamo = ?";
+
+        try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+            instruccion.setInt(1, idPrestamo);
+
+            try (ResultSet conjuntoResultados = instruccion.executeQuery()) {
+                if (conjuntoResultados.next()) {
+                    Date fechaReal = conjuntoResultados.getDate("fecha_devolucion_real");
+                    LocalDate fechaDevolucionReal = null;
+                    if (fechaReal != null) {
+                        fechaDevolucionReal = fechaReal.toLocalDate();
+                    }
+
+                    return new Prestamo(conjuntoResultados.getInt("id_prestamo"),
+                            conjuntoResultados.getInt("id_socio"),
+                            conjuntoResultados.getString("ISBN"),
+                            conjuntoResultados.getInt("nro_ejemplar"),
+                            conjuntoResultados.getDate("fecha_prestamo").toLocalDate(),
+                            conjuntoResultados.getDate("fecha_devolucion_prevista").toLocalDate(),
+                            fechaDevolucionReal);
+                }
+            }
+        }
+
+        return null;
     }
 
     public static void listar(Connection conexion) {
