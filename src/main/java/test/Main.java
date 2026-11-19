@@ -127,6 +127,8 @@ public class Main {
                     Socio.buscar(sc, conexion);
                     break;
                 case 4:
+                    Socio.modificar(sc, conexion);
+                    break;
                 case 5:
                     System.out.println("(pendiente)");
                     break;

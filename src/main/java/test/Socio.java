@@ -128,6 +128,43 @@ public class Socio {
         }
     }
 
+    public static void modificar(Scanner sc, Connection conexion) {
+        String dni = Main.leerTexto(sc, "Ingrese el DNI del socio a modificar: ");
+
+        try {
+            Socio socio = buscarPorDni(conexion, dni);
+
+            if (socio == null) {
+                System.out.println("No se encontró un socio con ese DNI.");
+                return;
+            }
+
+            System.out.println("\nDatos actuales:\n" + socio);
+            System.out.println("\nIngrese los nuevos datos:");
+
+            String nombre = Main.leerTexto(sc, "Nombre: ");
+            String telefono = Main.leerTexto(sc, "Teléfono: ");
+
+            String sql = "UPDATE SOCIO SET nombre = ?, telefono = ? WHERE id_socio = ?";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setString(1, nombre);
+                instruccion.setString(2, telefono);
+                instruccion.setInt(3, socio.getIdSocio());
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Socio modificado correctamente.");
+                } else {
+                    System.out.println("No se pudo modificar el socio.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al modificar el socio: " + e.getMessage());
+        }
+    }
+
     public static Socio buscarPorDni(Connection conexion, String dni) throws SQLException {
         String sql = "SELECT * FROM SOCIO WHERE DNI = ?";
 
