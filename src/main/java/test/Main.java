@@ -130,7 +130,7 @@ public class Main {
                     Socio.modificar(sc, conexion);
                     break;
                 case 5:
-                    System.out.println("(pendiente)");
+                    Socio.eliminar(sc, conexion);
                     break;
                 case 0:
                     break;

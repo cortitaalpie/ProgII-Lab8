@@ -165,6 +165,60 @@ public class Socio {
         }
     }
 
+    public static void eliminar(Scanner sc, Connection conexion) {
+        int idSocio = Main.leerEntero(sc, "Ingrese el ID del socio a eliminar: ");
+
+        try {
+            Socio socio = buscarPorId(conexion, idSocio);
+
+            if (socio == null) {
+                System.out.println("No se encontró un socio con ese ID.");
+                return;
+            }
+
+            if (contarPrestamos(conexion, idSocio) > 0) {
+                System.out.println("No se puede eliminar a " + socio.getNombre() + " porque tiene préstamos registrados.");
+                return;
+            }
+
+            String respuesta = Main.leerTexto(sc, "¿Está seguro de eliminar al socio \"" + socio.getNombre() + "\"? (S/N): ");
+
+            if (!respuesta.equalsIgnoreCase("S")) {
+                System.out.println("Operación cancelada.");
+                return;
+            }
+
+            String sql = "DELETE FROM SOCIO WHERE id_socio = ?";
+
+            try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+                instruccion.setInt(1, idSocio);
+
+                int resultado = instruccion.executeUpdate();
+
+                if (resultado == 1) {
+                    System.out.println("Socio eliminado correctamente.");
+                } else {
+                    System.out.println("No se pudo eliminar el socio.");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al eliminar el socio: " + e.getMessage());
+        }
+    }
+
+    private static int contarPrestamos(Connection conexion, int idSocio) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM PRESTAMO WHERE id_socio = ?";
+
+        try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+            instruccion.setInt(1, idSocio);
+
+            try (ResultSet conjuntoResultados = instruccion.executeQuery()) {
+                conjuntoResultados.next();
+                return conjuntoResultados.getInt(1);
+            }
+        }
+    }
+
     public static Socio buscarPorDni(Connection conexion, String dni) throws SQLException {
         String sql = "SELECT * FROM SOCIO WHERE DNI = ?";
 
@@ -173,15 +227,35 @@ public class Socio {
 
             try (ResultSet conjuntoResultados = instruccion.executeQuery()) {
                 if (conjuntoResultados.next()) {
-                    return new Socio(conjuntoResultados.getInt("id_socio"),
-                            conjuntoResultados.getString("nombre"),
-                            conjuntoResultados.getString("DNI"),
-                            conjuntoResultados.getString("telefono"),
-                            conjuntoResultados.getDate("fecha_alta").toLocalDate());
+                    return crearSocio(conjuntoResultados);
                 }
             }
         }
 
         return null;
+    }
+
+    public static Socio buscarPorId(Connection conexion, int idSocio) throws SQLException {
+        String sql = "SELECT * FROM SOCIO WHERE id_socio = ?";
+
+        try (PreparedStatement instruccion = conexion.prepareStatement(sql)) {
+            instruccion.setInt(1, idSocio);
+
+            try (ResultSet conjuntoResultados = instruccion.executeQuery()) {
+                if (conjuntoResultados.next()) {
+                    return crearSocio(conjuntoResultados);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static Socio crearSocio(ResultSet conjuntoResultados) throws SQLException {
+        return new Socio(conjuntoResultados.getInt("id_socio"),
+                conjuntoResultados.getString("nombre"),
+                conjuntoResultados.getString("DNI"),
+                conjuntoResultados.getString("telefono"),
+                conjuntoResultados.getDate("fecha_alta").toLocalDate());
     }
 }
