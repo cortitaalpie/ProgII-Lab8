@@ -154,6 +154,8 @@ public class Main {
 
             switch (opcion) {
                 case 1:
+                    Ejemplar.agregar(sc, conexion);
+                    break;
                 case 2:
                 case 3:
                     System.out.println("(pendiente)");
