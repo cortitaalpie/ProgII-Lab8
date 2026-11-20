@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
@@ -216,13 +215,10 @@ public class Main {
 
     static int leerEntero(Scanner sc, String mensaje) {
         while (true) {
-            System.out.print(mensaje);
+            String texto = leerTexto(sc, mensaje);
             try {
-                int numero = sc.nextInt();
-                sc.nextLine();
-                return numero;
-            } catch (InputMismatchException e) {
-                sc.nextLine();
+                return Integer.parseInt(texto);
+            } catch (NumberFormatException e) {
                 System.out.println("Debe ingresar un número.");
             }
         }
@@ -241,11 +237,8 @@ public class Main {
 
     private static int leerOpcion(Scanner sc) {
         try {
-            int opcion = sc.nextInt();
-            sc.nextLine();
-            return opcion;
-        } catch (InputMismatchException e) {
-            sc.nextLine();
+            return Integer.parseInt(sc.nextLine().trim());
+        } catch (NumberFormatException e) {
             return -1;
         }
     }
